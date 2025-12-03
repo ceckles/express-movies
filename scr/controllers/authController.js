@@ -7,10 +7,10 @@ const registerUserController = async (req, res) => {
         //destructure the body
         const { name, email, password } = req.body;
 
-        //validate the body
-        if (!name || !email || !password) {
-            return res.status(400).json({ message: 'All fields are required' });
-        }
+        //validate the body without using zod
+        // if (!name || !email || !password) {
+        //     return res.status(400).json({ message: 'All fields are required' });
+        // }
 
         //Check if user exists already
         const userExists = await prisma.user.findUnique({ where: { email } });
@@ -53,10 +53,10 @@ const loginUserController = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        //Validate the body
-        if (!email || !password) {
-            return res.status(400).json({ error: 'All fields are required' });
-        }
+        //Validate the body without using zod
+        // if (!email || !password) {
+        //     return res.status(400).json({ error: 'All fields are required' });
+        // }
 
         //Check if user exists
         const userExists = await prisma.user.findUnique({ where: { email } });

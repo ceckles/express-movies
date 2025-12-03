@@ -3,10 +3,10 @@ const { prisma } = require('../config/db');
 const addToWatchlistController = async (req, res) => {
     const { movieId, status, rating, notes } = req.body;
 
-    //validated body
-    if (!movieId || !status || !rating || !notes) {
-        return res.status(400).json({ error: 'All fields are required' });
-    }
+    // //validated body without using zod
+    // if (!movieId || !status || !rating || !notes) {
+    //     return res.status(400).json({ error: 'All fields are required' });
+    // }
 
     //check if movie exists
     const movieExists = await prisma.movie.findUnique({ where: { id: movieId } });
@@ -53,10 +53,10 @@ const updateWatchlistItemController = async (req, res) => {
         const { id } = req.params;
         const { status, rating, notes } = req.body;
 
-        //Validate request body
-        if (!status && !rating && !notes) {
-            return res.status(400).json({ error: 'At least one field is required' });
-        }
+        // //Validate request body without using zod
+        // if (!status && !rating && !notes) {
+        //     return res.status(400).json({ error: 'At least one field is required' });
+        // }
 
         // Find watchlist item and verify ownership
         const watchlistItem = await prisma.watchlistItem.findUnique({
