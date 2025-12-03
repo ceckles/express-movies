@@ -1,11 +1,13 @@
 const express = require('express');
-const { addToWatchlistController } = require('../controllers/watchlistController');
+const { addToWatchlistController, deleteFromWatchlistController } = require('../controllers/watchlistController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 //Apply authentication middleware to all routes in watchlistRoutes
-router.use(authMiddleware);
+//router.use(authMiddleware);
 
-router.post('/', addToWatchlistController);
+//Added authMiddleware to watchlist post route
+router.post('/', authMiddleware, addToWatchlistController);
+router.delete('/:id', authMiddleware, deleteFromWatchlistController);
 
 module.exports = router;
