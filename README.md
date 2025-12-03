@@ -187,13 +187,17 @@ backend-express/
 │   │   ├── authController.js
 │   │   └── watchlistController.js
 │   ├── middleware/
-│   │   └── authMiddleware.js
+│   │   ├── authMiddleware.js
+│   │   └── validateRequestMiddleware.js
 │   ├── routes/
 │   │   ├── authRoutes.js
 │   │   ├── movieRoutes.js
 │   │   └── watchlistRoutes.js
 │   ├── utils/
 │   │   └── generateToken.js
+│   ├── validators/
+│   │   ├── authValidator.js
+│   │   └── watchlistValidator.js
 │   └── server.js         # Application entry point
 ├── .env                  # Environment variables (not in git)
 ├── .gitignore
@@ -221,6 +225,34 @@ The API uses JWT (JSON Web Tokens) for authentication.
    Authorization: Bearer <your-jwt-token>
    ```
 3. Protected routes require valid authentication
+
+## ✅ Request Validation
+
+The API uses **Zod** for request validation. All incoming request bodies are validated against predefined schemas before processing.
+
+### Validation Middleware
+
+The `validateRequestMiddleware` validates request bodies using Zod schemas:
+
+```javascript
+router.post('/', authMiddleware, validateRequestMiddleware(schema), controller);
+```
+
+### Available Validators
+
+- **authValidator.js** - Validates registration and login requests
+- **watchlistValidator.js** - Validates watchlist operations
+  - `addToWatchlistSchema` - Validates adding movies to watchlist
+  - `updateWatchlistItemSchema` - Validates updating watchlist items
+
+### Validation Features
+
+- **Type Safety** - Ensures correct data types (UUID, string, number, enum)
+- **Custom Error Messages** - Provides clear validation error messages
+- **Automatic Coercion** - Converts compatible types (e.g., string to number)
+- **Field Constraints** - Enforces min/max values, string lengths, and enum values
+
+Invalid requests return a `400 Bad Request` with detailed error messages.
 
 ## 🗄️ Database Schema
 
@@ -279,11 +311,14 @@ npx prisma studio
 The API uses try/catch blocks for error handling and returns appropriate HTTP status codes:
 - `200` - Success
 - `201` - Created
-- `400` - Bad Request
-- `401` - Unauthorized
-- `403` - Forbidden
-- `404` - Not Found
-- `500` - Internal Server Error
+- `400` - Bad Request (validation errors, invalid input)
+- `401` - Unauthorized (invalid or missing authentication)
+- `403` - Forbidden (insufficient permissions)
+- `404` - Not Found (resource doesn't exist)
+- `500` - Internal Server Error (server/database errors)
+
+**Validation Errors:**
+When request validation fails (Zod), the API returns a `400 Bad Request` with a message containing all validation errors.
 
 
 
