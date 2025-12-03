@@ -1,14 +1,23 @@
 # Backend Express API
 
-A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing movies and user watchlists.
+A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing movies and user watchlists. Features JWT authentication and Zod validation for request validation.
 
 ## 🛠️ Tech Stack
+
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-3E63DD?style=for-the-badge&logo=zod&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
 - **Runtime:** Node.js
 - **Framework:** Express.js 5.2.1
 - **Database:** PostgreSQL (via Neon)
 - **ORM:** Prisma 6.19.0
 - **Authentication:** JWT (jsonwebtoken)
+- **Validation:** Zod
 - **Password Hashing:** bcryptjs
 - **Environment Variables:** dotenv
 - **Package Manager:** pnpm
