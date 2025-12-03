@@ -49,4 +49,8 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
+
+#Run prebuild check
+RUN dotenvx ext prebuild
+
 CMD [ "node", "src/server.js" ]
