@@ -1,7 +1,7 @@
 const { prisma } = require('../config/db');
 
 const addToWatchlistController = async (req, res) => {
-    const { movieId, status, rating, notes, userId } = req.body;
+    const { movieId, status, rating, notes } = req.body;
 
     //validated body
     if (!movieId || !status || !rating || !notes) {
@@ -17,7 +17,7 @@ const addToWatchlistController = async (req, res) => {
     //Check if already in watchlist
     const movieInWatchlist = await prisma.watchlistItem.findFirst({
         where: {
-            userId: userId,
+            userId: req.user.id,
             movieId: movieId
         }
     });
@@ -28,7 +28,7 @@ const addToWatchlistController = async (req, res) => {
     //Create watchlist item
     const watchlistItem = await prisma.watchlistItem.create({
         data: {
-            userId,
+            userId: req.user.id,
             movieId,
             status: status || "PLANNED",
             rating: rating || null,
