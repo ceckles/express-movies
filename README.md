@@ -10,6 +10,7 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
 ![Zod](https://img.shields.io/badge/Zod-3E63DD?style=for-the-badge&logo=zod&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
 - **Runtime:** Node.js
@@ -21,6 +22,8 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 - **Password Hashing:** bcryptjs
 - **Environment Variables:** dotenv
 - **Package Manager:** pnpm
+- **Containerization:** Docker
+- **Deployment:** Fly.io
 
 ## 📋 Prerequisites
 
@@ -76,7 +79,7 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 | `DATABASE_URL` | PostgreSQL connection string | Yes | - |
 | `JWT_SECRET` | Secret key for JWT tokens | Yes | - |
 | `JWT_EXPIRES_IN` | JWT token expiration time | No | `7d` |
-| `PORT` | Server port | No | `5001` |
+| `PORT` | Server port | No | `5001` (dev) / `3000` (production/Fly.io) |
 | `NODE_ENV` | Environment mode | No | `development`/`production` |
 
 ### Database Setup
@@ -95,10 +98,54 @@ Starts the server with nodemon for auto-reloading.
 
 ### Production Mode
 ```bash
-node scr/server.js
+node src/server.js
 ```
 
 The server will start on `http://localhost:5001` (or your configured PORT).
+
+## 🚀 Deployment
+
+### Fly.io
+
+The application is deployed on [Fly.io](https://fly.io) at: **https://express-movies.fly.dev**
+
+#### Prerequisites
+- Fly.io CLI installed (`flyctl`)
+- Fly.io account
+
+#### Deployment Steps
+
+1. **Install Fly.io CLI** (if not already installed)
+   ```bash
+   curl -L https://fly.io/install.sh | sh
+   ```
+
+2. **Login to Fly.io**
+   ```bash
+   fly auth login
+   ```
+
+3. **Set environment variables/secrets**
+   ```bash
+   fly secrets set DATABASE_URL="your-database-url"
+   fly secrets set JWT_SECRET="your-jwt-secret"
+   fly secrets set JWT_EXPIRES_IN="7d"
+   fly secrets set PORT=3000
+   fly secrets set NODE_ENV="production"
+   ```
+
+4. **Deploy**
+   ```bash
+   fly deploy
+   ```
+
+#### Fly.io Configuration
+
+- **Internal Port:** 3000 (configured in `fly.toml`)
+- **Auto-scaling:** Enabled (machines auto-start/stop)
+- **Region:** dfw (Dallas)
+
+**Note:** The app listens on `0.0.0.0` in production to allow external connections.
 
 ## 📡 API Endpoints
 
@@ -180,7 +227,7 @@ backend-express/
 │   ├── schema.prisma      # Database schema
 │   ├── migrations/        # Database migrations
 │   └── seed.js           # Database seed file
-├── scr/
+├── src/
 │   ├── config/
 │   │   └── db.js         # Database connection
 │   ├── controllers/
