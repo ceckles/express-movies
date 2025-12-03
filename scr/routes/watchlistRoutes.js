@@ -1,5 +1,5 @@
 const express = require('express');
-const { addToWatchlistController, deleteFromWatchlistController } = require('../controllers/watchlistController');
+const { addToWatchlistController, deleteFromWatchlistController, updateWatchlistItemController } = require('../controllers/watchlistController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -9,5 +9,6 @@ const router = express.Router();
 //Added authMiddleware to watchlist post route
 router.post('/', authMiddleware, addToWatchlistController);
 router.delete('/:id', authMiddleware, deleteFromWatchlistController);
+router.put('/:id', authMiddleware, updateWatchlistItemController);
 
 module.exports = router;
