@@ -5,6 +5,7 @@ const { connectDB, disconnectDB } = require('./config/db');
 //Routes Imports
 const authRoutes = require('./routes/authRoutes');
 const movieRoutes = require('./routes/movieRoutes');
+const watchlistRoutes = require('./routes/watchlistRoutes');
 
 //ENV Variables
 const PORT = process.env.PORT || 5001;
@@ -22,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 //API Routes
 app.use("/auth", authRoutes);
 app.use("/movies", movieRoutes);
-
+app.use("/watchlist", watchlistRoutes);
 
 //Health Check
 app.get('/health', (req, res)=>{
