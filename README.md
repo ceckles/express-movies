@@ -179,6 +179,36 @@ The application is deployed on [Fly.io](https://fly.io) at: **https://express-mo
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | GET | `/movies` | Get all movies | No |
+| GET | `/movies/:id` | Get movie by ID | No |
+| POST | `/movies` | Create a new movie | Yes |
+| PUT | `/movies/:id` | Update a movie (creator only) | Yes |
+| DELETE | `/movies/:id` | Delete a movie (creator only) | Yes |
+
+**Create Movie Request Body:**
+```json
+{
+  "title": "The Matrix",
+  "overview": "A computer hacker learns about the true nature of reality",
+  "releaseYear": 1999,
+  "genres": ["Action", "Sci-Fi"],
+  "runtime": 136,
+  "posterUrl": "https://example.com/poster.jpg"
+}
+```
+
+**Update Movie Request Body:**
+```json
+{
+  "title": "The Matrix Reloaded",
+  "overview": "Neo continues his journey",
+  "releaseYear": 2003,
+  "genres": ["Action", "Sci-Fi"],
+  "runtime": 138,
+  "posterUrl": "https://example.com/poster2.jpg"
+}
+```
+
+**Note:** All fields in the update request are optional. Only the creator of a movie can update or delete it.
 
 ### Watchlist (`/watchlist`)
 
@@ -232,6 +262,7 @@ backend-express/
 │   │   └── db.js         # Database connection
 │   ├── controllers/
 │   │   ├── authController.js
+│   │   ├── movieController.js
 │   │   └── watchlistController.js
 │   ├── middleware/
 │   │   ├── authMiddleware.js
@@ -244,6 +275,7 @@ backend-express/
 │   │   └── generateToken.js
 │   ├── validators/
 │   │   ├── authValidator.js
+│   │   ├── movieValidator.js
 │   │   └── watchlistValidator.js
 │   └── server.js         # Application entry point
 ├── .env                  # Environment variables (not in git)
@@ -262,7 +294,7 @@ backend-express/
 | `npx prisma migrate dev` | Run database migrations |
 | `npx prisma studio` | Open Prisma Studio (database GUI) |
 
-## 🔐 Authentication
+## 🔐 Authentication & Authorization
 
 The API uses JWT (JSON Web Tokens) for authentication. 
 
@@ -272,6 +304,12 @@ The API uses JWT (JSON Web Tokens) for authentication.
    Authorization: Bearer <your-jwt-token>
    ```
 3. Protected routes require valid authentication
+
+### Authorization Rules
+
+- **Movies**: Only the creator of a movie can update or delete it
+- **Watchlist**: Users can only manage their own watchlist items
+- **Public Endpoints**: GET requests for movies are public (no auth required)
 
 ## ✅ Request Validation
 
@@ -288,6 +326,11 @@ router.post('/', authMiddleware, validateRequestMiddleware(schema), controller);
 ### Available Validators
 
 - **authValidator.js** - Validates registration and login requests
+  - `registerUserSchema` - Validates user registration
+  - `loginUserSchema` - Validates user login
+- **movieValidator.js** - Validates movie operations
+  - `createMovieSchema` - Validates creating movies (title, releaseYear required)
+  - `updateMovieSchema` - Validates updating movies (all fields optional)
 - **watchlistValidator.js** - Validates watchlist operations
   - `addToWatchlistSchema` - Validates adding movies to watchlist
   - `updateWatchlistItemSchema` - Validates updating watchlist items
@@ -298,6 +341,15 @@ router.post('/', authMiddleware, validateRequestMiddleware(schema), controller);
 - **Custom Error Messages** - Provides clear validation error messages
 - **Automatic Coercion** - Converts compatible types (e.g., string to number)
 - **Field Constraints** - Enforces min/max values, string lengths, and enum values
+
+### Movie Validation Rules
+
+- **title**: Required string (min 1 character)
+- **overview**: Optional string
+- **releaseYear**: Required integer (1888 to current year + 10)
+- **genres**: Optional array of strings (defaults to empty array)
+- **runtime**: Optional positive integer (in minutes)
+- **posterUrl**: Optional valid URL string
 
 Invalid requests return a `400 Bad Request` with detailed error messages.
 
