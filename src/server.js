@@ -30,9 +30,8 @@ app.get('/health', (req, res)=>{
     res.status(200).json({message: 'Server is running'});
 });
 
-const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : undefined;
-const server = app.listen(PORT, host, ()=>{
-    console.log(`Server is running on ${host || 'localhost'}:${PORT}`);
+const server = app.listen(process.env.PORT || 5001, "0.0.0.0", () => {
+  console.log(`Server running on PORT ${process.env.PORT}`);
 });
 
 //Disconnect from database

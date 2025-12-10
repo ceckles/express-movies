@@ -23,7 +23,6 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 - **Environment Variables:** dotenv
 - **Package Manager:** pnpm
 - **Containerization:** Docker
-- **Deployment:** Fly.io
 
 ## 📋 Prerequisites
 
@@ -79,7 +78,7 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 | `DATABASE_URL` | PostgreSQL connection string | Yes | - |
 | `JWT_SECRET` | Secret key for JWT tokens | Yes | - |
 | `JWT_EXPIRES_IN` | JWT token expiration time | No | `7d` |
-| `PORT` | Server port | No | `5001` (dev) / `3000` (production/Fly.io) |
+| `PORT` | Server port | No | `5001` (dev) / `3000` (production) |
 | `NODE_ENV` | Environment mode | No | `development`/`production` |
 
 ### Database Setup
@@ -105,47 +104,21 @@ The server will start on `http://localhost:5001` (or your configured PORT).
 
 ## 🚀 Deployment
 
-### Fly.io
+The application can be deployed to any platform that supports Node.js applications (e.g., Heroku, Railway, Render, AWS, DigitalOcean, etc.).
 
-The application is deployed on [Fly.io](https://fly.io) at: **https://express-movies.fly.dev**
+### Docker Deployment
 
-#### Prerequisites
-- Fly.io CLI installed (`flyctl`)
-- Fly.io account
+The project includes a `Dockerfile` for containerized deployments:
 
-#### Deployment Steps
+```bash
+# Build the Docker image
+docker build -t backend-express .
 
-1. **Install Fly.io CLI** (if not already installed)
-   ```bash
-   curl -L https://fly.io/install.sh | sh
-   ```
+# Run the container
+docker run -p 3000:3000 --env-file .env backend-express
+```
 
-2. **Login to Fly.io**
-   ```bash
-   fly auth login
-   ```
-
-3. **Set environment variables/secrets**
-   ```bash
-   fly secrets set DATABASE_URL="your-database-url"
-   fly secrets set JWT_SECRET="your-jwt-secret"
-   fly secrets set JWT_EXPIRES_IN="7d"
-   fly secrets set PORT=3000
-   fly secrets set NODE_ENV="production"
-   ```
-
-4. **Deploy**
-   ```bash
-   fly deploy
-   ```
-
-#### Fly.io Configuration
-
-- **Internal Port:** 3000 (configured in `fly.toml`)
-- **Auto-scaling:** Enabled (machines auto-start/stop)
-- **Region:** dfw (Dallas)
-
-**Note:** The app listens on `0.0.0.0` in production to allow external connections.
+**Note:** Make sure to set all required environment variables when deploying. The app listens on `0.0.0.0` in production to allow external connections.
 
 ## 📡 API Endpoints
 
@@ -179,36 +152,6 @@ The application is deployed on [Fly.io](https://fly.io) at: **https://express-mo
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | GET | `/movies` | Get all movies | No |
-| GET | `/movies/:id` | Get movie by ID | No |
-| POST | `/movies` | Create a new movie | Yes |
-| PUT | `/movies/:id` | Update a movie (creator only) | Yes |
-| DELETE | `/movies/:id` | Delete a movie (creator only) | Yes |
-
-**Create Movie Request Body:**
-```json
-{
-  "title": "The Matrix",
-  "overview": "A computer hacker learns about the true nature of reality",
-  "releaseYear": 1999,
-  "genres": ["Action", "Sci-Fi"],
-  "runtime": 136,
-  "posterUrl": "https://example.com/poster.jpg"
-}
-```
-
-**Update Movie Request Body:**
-```json
-{
-  "title": "The Matrix Reloaded",
-  "overview": "Neo continues his journey",
-  "releaseYear": 2003,
-  "genres": ["Action", "Sci-Fi"],
-  "runtime": 138,
-  "posterUrl": "https://example.com/poster2.jpg"
-}
-```
-
-**Note:** All fields in the update request are optional. Only the creator of a movie can update or delete it.
 
 ### Watchlist (`/watchlist`)
 
@@ -262,7 +205,6 @@ backend-express/
 │   │   └── db.js         # Database connection
 │   ├── controllers/
 │   │   ├── authController.js
-│   │   ├── movieController.js
 │   │   └── watchlistController.js
 │   ├── middleware/
 │   │   ├── authMiddleware.js
@@ -275,7 +217,6 @@ backend-express/
 │   │   └── generateToken.js
 │   ├── validators/
 │   │   ├── authValidator.js
-│   │   ├── movieValidator.js
 │   │   └── watchlistValidator.js
 │   └── server.js         # Application entry point
 ├── .env                  # Environment variables (not in git)
@@ -294,7 +235,7 @@ backend-express/
 | `npx prisma migrate dev` | Run database migrations |
 | `npx prisma studio` | Open Prisma Studio (database GUI) |
 
-## 🔐 Authentication & Authorization
+## 🔐 Authentication
 
 The API uses JWT (JSON Web Tokens) for authentication. 
 
@@ -304,12 +245,6 @@ The API uses JWT (JSON Web Tokens) for authentication.
    Authorization: Bearer <your-jwt-token>
    ```
 3. Protected routes require valid authentication
-
-### Authorization Rules
-
-- **Movies**: Only the creator of a movie can update or delete it
-- **Watchlist**: Users can only manage their own watchlist items
-- **Public Endpoints**: GET requests for movies are public (no auth required)
 
 ## ✅ Request Validation
 
@@ -326,11 +261,6 @@ router.post('/', authMiddleware, validateRequestMiddleware(schema), controller);
 ### Available Validators
 
 - **authValidator.js** - Validates registration and login requests
-  - `registerUserSchema` - Validates user registration
-  - `loginUserSchema` - Validates user login
-- **movieValidator.js** - Validates movie operations
-  - `createMovieSchema` - Validates creating movies (title, releaseYear required)
-  - `updateMovieSchema` - Validates updating movies (all fields optional)
 - **watchlistValidator.js** - Validates watchlist operations
   - `addToWatchlistSchema` - Validates adding movies to watchlist
   - `updateWatchlistItemSchema` - Validates updating watchlist items
@@ -341,15 +271,6 @@ router.post('/', authMiddleware, validateRequestMiddleware(schema), controller);
 - **Custom Error Messages** - Provides clear validation error messages
 - **Automatic Coercion** - Converts compatible types (e.g., string to number)
 - **Field Constraints** - Enforces min/max values, string lengths, and enum values
-
-### Movie Validation Rules
-
-- **title**: Required string (min 1 character)
-- **overview**: Optional string
-- **releaseYear**: Required integer (1888 to current year + 10)
-- **genres**: Optional array of strings (defaults to empty array)
-- **runtime**: Optional positive integer (in minutes)
-- **posterUrl**: Optional valid URL string
 
 Invalid requests return a `400 Bad Request` with detailed error messages.
 
