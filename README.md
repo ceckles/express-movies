@@ -10,7 +10,6 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
 ![Zod](https://img.shields.io/badge/Zod-3E63DD?style=for-the-badge&logo=zod&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
 - **Runtime:** Node.js
@@ -22,7 +21,6 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 - **Password Hashing:** bcryptjs
 - **Environment Variables:** dotenv
 - **Package Manager:** pnpm
-- **Containerization:** Docker
 
 ## 📋 Prerequisites
 
@@ -105,18 +103,6 @@ The server will start on `http://localhost:5001` (or your configured PORT).
 ## 🚀 Deployment
 
 The application can be deployed to any platform that supports Node.js applications (e.g., Heroku, Railway, Render, AWS, DigitalOcean, etc.).
-
-### Docker Deployment
-
-The project includes a `Dockerfile` for containerized deployments:
-
-```bash
-# Build the Docker image
-docker build -t backend-express .
-
-# Run the container
-docker run -p 3000:3000 --env-file .env backend-express
-```
 
 **Note:** Make sure to set all required environment variables when deploying. The app listens on `0.0.0.0` in production to allow external connections.
 
