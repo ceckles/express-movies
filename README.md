@@ -152,6 +152,44 @@ docker run -p 3000:3000 --env-file .env backend-express
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | GET | `/movies` | Get all movies | No |
+| GET | `/movies/:id` | Get movie by ID | No |
+| POST | `/movies` | Create a new movie | Yes |
+| PUT | `/movies/:id` | Update a movie (creator only) | Yes |
+| DELETE | `/movies/:id` | Delete a movie (creator only) | Yes |
+
+**Create Movie Request Body:**
+```json
+{
+  "title": "The Matrix",
+  "overview": "A computer hacker learns about the true nature of reality",
+  "releaseYear": 1999,
+  "genres": ["Action", "Sci-Fi"],
+  "runtime": 136,
+  "posterUrl": "https://example.com/poster.jpg"
+}
+```
+
+**Update Movie Request Body:**
+```json
+{
+  "title": "The Matrix Reloaded",
+  "overview": "Neo continues his journey",
+  "releaseYear": 2003,
+  "genres": ["Action", "Sci-Fi"],
+  "runtime": 138,
+  "posterUrl": "https://example.com/poster2.jpg"
+}
+```
+
+**Delete Movie Response:**
+```json
+{
+  "status": "success",
+  "message": "Movie deleted successfully"
+}
+```
+
+**Note:** All fields in the update request are optional. Only the creator of a movie can update or delete it.
 
 ### Watchlist (`/watchlist`)
 
@@ -331,10 +369,11 @@ npx prisma studio
 The API uses try/catch blocks for error handling and returns appropriate HTTP status codes:
 - `200` - Success
 - `201` - Created
-- `400` - Bad Request (validation errors, invalid input)
+- `400` - Bad Request (validation errors, invalid input, missing required fields)
 - `401` - Unauthorized (invalid or missing authentication)
-- `403` - Forbidden (insufficient permissions)
+- `403` - Forbidden (insufficient permissions, e.g., not the creator)
 - `404` - Not Found (resource doesn't exist)
+- `409` - Conflict (resource cannot be deleted due to foreign key constraints)
 - `500` - Internal Server Error (server/database errors)
 
 **Validation Errors:**
@@ -345,8 +384,3 @@ When request validation fails (Zod), the API returns a `400 Bad Request` with a 
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
-
-## 📞 Support
-
-For support, open an issue in the repository.
-
