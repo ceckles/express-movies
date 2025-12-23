@@ -4,10 +4,13 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
+    "dev": "doppler run -p backend-express -c dev -- nodemon src/server.js",
+    "dev:local": "nodemon src/server.js",
+    "start": "doppler run -p backend-express -c prod -- node src/server.js",
+    "start:local": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed:movies": "node prisma/seed.js"
+    "seed:movies": "doppler run -p backend-express -c dev -- node prisma/seed.js",
+    "seed:movies:local": "node prisma/seed.js"
   },
   "keywords": [],
   "author": "",

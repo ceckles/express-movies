@@ -7,10 +7,6 @@ const authRoutes = require('./routes/authRoutes');
 const movieRoutes = require('./routes/movieRoutes');
 const watchlistRoutes = require('./routes/watchlistRoutes');
 
-//ENV Variables
-const PORT = process.env.PORT || 3000;
-
-
 config();
 connectDB();
 
@@ -30,8 +26,9 @@ app.get('/health', (req, res)=>{
     res.status(200).json({message: 'Server is running'});
 });
 
-const server = app.listen(process.env.PORT || 5001, "0.0.0.0", () => {
-  console.log(`Server running on PORT ${process.env.PORT}`);
+const PORT = process.env.PORT || 5001;
+const server = app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on PORT ${PORT}`);
 });
 
 //Disconnect from database

@@ -10,6 +10,7 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
 ![Zod](https://img.shields.io/badge/Zod-3E63DD?style=for-the-badge&logo=zod&logoColor=white)
+![Doppler](https://img.shields.io/badge/Doppler-9f6afe?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkwxMy4wOSA4LjI2TDIwIDlMMTMuMDkgMTUuNzRMMTIgMjJMMTAuOTEgMTUuNzRMNCA5TDEwLjkxIDguMjZMMTIgMloiIGZpbGw9IndoaXRlIi8+PC9zdmc+)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
 - **Runtime:** Node.js
@@ -19,7 +20,8 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 - **Authentication:** JWT (jsonwebtoken)
 - **Validation:** Zod
 - **Password Hashing:** bcryptjs
-- **Environment Variables:** dotenv
+- **Environment Variables:** dotenv / Doppler
+- **Secrets Management:** Doppler
 - **Package Manager:** pnpm
 
 ## 📋 Prerequisites
@@ -28,6 +30,7 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 - pnpm (or npm/yarn)
 - PostgreSQL database (Neon, local, or cloud)
 - Git
+- Doppler CLI (optional, for secrets management)
 
 ## 🚀 Installation
 
@@ -43,6 +46,37 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
    ```
 
 3. **Set up environment variables**
+
+   **Option A: Using Doppler (Recommended)**
+   
+   Install Doppler CLI:
+   ```bash
+   # Linux/macOS
+   curl -L --tlsv1.2 --proto "=https" -sSf https://cli.doppler.com/install.sh | sh
+   
+   # Or using Homebrew (macOS)
+   brew install doppler
+   
+   # Or using npm/pnpm
+   pnpm add -g doppler-cli
+   ```
+   
+   Authenticate with Doppler:
+   ```bash
+   doppler login
+   ```
+   
+   Link your project to a Doppler config:
+   ```bash
+   doppler setup
+   ```
+   
+   This will prompt you to select:
+   - Your Doppler project
+   - The config (e.g., `dev`, `staging`, `prod`)
+   
+   **Option B: Using .env file (Local Development)**
+   
    Create a `.env` file in the root directory:
    ```env
    DATABASE_URL="postgresql://user:password@host:port/database"
@@ -79,32 +113,133 @@ A RESTful API built with Express.js, Prisma ORM, and PostgreSQL for managing mov
 | `PORT` | Server port | No | `5001` (dev) / `3000` (production) |
 | `NODE_ENV` | Environment mode | No | `development`/`production` |
 
+### Secrets Management with Doppler
+
+This project supports **Doppler** for secure secrets management. Doppler allows you to:
+- Store secrets securely in the cloud
+- Manage different configs (dev, staging, prod) per environment
+- Sync secrets across team members
+- Rotate secrets without code changes
+- Audit secret access
+
+**Setting up Doppler:**
+
+1. **Create a Doppler account** at [doppler.com](https://doppler.com)
+
+2. **Create a project** in the Doppler dashboard
+
+3. **Add your secrets** to Doppler:
+   - Go to your project → Config (e.g., `dev`)
+   - Add all required environment variables:
+     - `DATABASE_URL`
+     - `JWT_SECRET`
+     - `JWT_EXPIRES_IN`
+     - `PORT`
+     - `NODE_ENV`
+
+4. **Authenticate with Doppler:**
+   ```bash
+   doppler login
+   ```
+
+5. **Verify secrets are loaded:**
+   ```bash
+   doppler secrets -p backend-express -c dev
+   ```
+
+**Using Doppler in different environments:**
+
+The project is configured to use the `backend-express` Doppler project. The scripts automatically use the correct config:
+
+```bash
+# Development (uses dev config)
+pnpm run dev
+# Equivalent to: doppler run -p backend-express -c dev -- nodemon src/server.js
+
+# Production (uses prod config)
+pnpm run start
+# Equivalent to: doppler run -p backend-express -c prod -- node src/server.js
+
+# For other configs, run directly:
+doppler run -p backend-express -c staging -- node src/server.js
+```
+
+**Note:** The default scripts (`pnpm run dev`, `pnpm run start`) use Doppler with the `backend-express` project. Use `dev:local` or `start:local` scripts if you prefer using `.env` files.
+
 ### Database Setup
 
 1. Create a PostgreSQL database (or use Neon)
-2. Copy your connection string to `DATABASE_URL` in `.env`
+2. Add `DATABASE_URL` to your Doppler config or `.env` file
 3. Run migrations: `npx prisma migrate dev`
 
 ## 🏃 Running the Project
 
 ### Development Mode
+
+**With Doppler (Recommended):**
 ```bash
 pnpm run dev
 ```
-Starts the server with nodemon for auto-reloading.
+This uses Doppler to inject environment variables and starts the server with nodemon for auto-reloading.
+
+**With .env file (Local):**
+```bash
+pnpm run dev:local
+```
 
 ### Production Mode
+
+**With Doppler:**
 ```bash
-node src/server.js
+pnpm run start
+```
+
+**With .env file:**
+```bash
+pnpm run start:local
 ```
 
 The server will start on `http://localhost:5001` (or your configured PORT).
+
+**Note:** Make sure you have either:
+- Doppler configured (`doppler setup`) and authenticated (`doppler login`), OR
+- A `.env` file in the root directory with all required variables
 
 ## 🚀 Deployment
 
 The application can be deployed to any platform that supports Node.js applications (e.g., Heroku, Railway, Render, AWS, DigitalOcean, etc.).
 
+### Deployment with Doppler
+
+Doppler provides seamless integration with most deployment platforms:
+
+1. **Install Doppler CLI** in your deployment environment
+2. **Authenticate** using a service token:
+   ```bash
+   doppler configure set token <service-token>
+   ```
+3. **Update your start command** to use Doppler with the project and config:
+   ```bash
+   doppler run -p backend-express -c prod -- node src/server.js
+   ```
+   
+   Or use the npm script:
+   ```bash
+   pnpm run start
+   ```
+
+**Platform-specific guides:**
+- [Railway + Doppler](https://docs.doppler.com/docs/railway)
+- [Render + Doppler](https://docs.doppler.com/docs/render)
+- [Heroku + Doppler](https://docs.doppler.com/docs/heroku)
+- [AWS + Doppler](https://docs.doppler.com/docs/aws)
+- [Docker + Doppler](https://docs.doppler.com/docs/docker)
+
+### Deployment with Environment Variables
+
 **Note:** Make sure to set all required environment variables when deploying. The app listens on `0.0.0.0` in production to allow external connections.
+
+For platforms that don't support Doppler, set environment variables directly in your platform's dashboard or configuration.
 
 ## 📡 API Endpoints
 
@@ -253,8 +388,12 @@ backend-express/
 
 | Script | Description |
 |--------|-------------|
-| `pnpm run dev` | Start development server with nodemon |
-| `pnpm run seed:movies` | Seed database with movie data |
+| `pnpm run dev` | Start development server with nodemon (uses Doppler) |
+| `pnpm run dev:local` | Start development server with nodemon (uses .env file) |
+| `pnpm run start` | Start production server (uses Doppler) |
+| `pnpm run start:local` | Start production server (uses .env file) |
+| `pnpm run seed:movies` | Seed database with movie data (uses Doppler) |
+| `pnpm run seed:movies:local` | Seed database with movie data (uses .env file) |
 | `npx prisma generate` | Generate Prisma Client |
 | `npx prisma migrate dev` | Run database migrations |
 | `npx prisma studio` | Open Prisma Studio (database GUI) |
